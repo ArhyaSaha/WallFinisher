@@ -147,11 +147,6 @@ const CanvasVisualization = ({
     if (currentSegment.length > 0) {
       segments.push({ points: currentSegment, toolActive: currentToolActive });
     }
-    console.log(trajectory.filter(p => !p.tool_active));
-    console.log('Segments:', segments.map(s => ({
-      points: s.points.length,
-      toolActive: s.toolActive
-    })));
 
     // Draw each segment as thick continuous lines
     segments.forEach(segment => {

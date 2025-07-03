@@ -6,6 +6,8 @@ import ObstacleManager from './components/ObstacleManager';
 import TrajectoryControls from './components/TrajectoryControls';
 import { API_BASE_URL } from './utils/api';
 import SavedTrajectories from './components/SavedTrajectories';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [wallDimensions, setWallDimensions] = useState({ width: 5, height: 5 });
@@ -59,11 +61,14 @@ function App() {
         setTrajectory(data.trajectory);
         setCurrentPoint(0);
         addLog(`Trajectory generated with ${data.trajectory.length} points`, 'success');
+        toast.success(`Trajectory generated with ${data.trajectory.length} points!`);
       } else {
         addLog('Failed to generate trajectory', 'error');
+        toast.error('Failed to generate trajectory');
       }
     } catch (error) {
       addLog(`Error: ${error.message}`, 'error');
+      toast.error(`Error: ${error.message}`);
     } finally {
       setIsGenerating(false);
     }
@@ -72,6 +77,7 @@ function App() {
   const saveTrajectory = async () => {
     if (trajectory.length === 0) {
       addLog('No trajectory to save', 'warning');
+      toast.warning('No trajectory to save');
       return;
     }
 
@@ -92,11 +98,14 @@ function App() {
       if (response.ok) {
         const data = await response.json();
         addLog(`Trajectory saved with ID: ${data.id}`, 'success');
+        toast.success(`Trajectory saved with ID: ${data.id}`);
       } else {
         addLog('Failed to save trajectory', 'error');
+        toast.error('Failed to save trajectory');
       }
     } catch (error) {
       addLog(`Save error: ${error.message}`, 'error');
+      toast.error(`Save error: ${error.message}`);
     }
   };
 

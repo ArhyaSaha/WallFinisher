@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Archive, Calendar, Square, Activity, Clock, Layers, Trash2 } from 'lucide-react';
 import { API_BASE_URL } from '../utils/api';
+import { toast } from 'react-toastify';
 
 const SavedTrajectories = () => {
     const [trajectories, setTrajectories] = useState([]);
@@ -43,8 +44,9 @@ const SavedTrajectories = () => {
             }
 
             setTrajectories((prev) => prev.filter((trajectory) => trajectory.id !== id));
+            toast.success(`Trajectory #${id} deleted successfully!`);
         } catch (err) {
-            alert(err.message);
+            toast.error(`Failed to delete trajectory: ${err.message}`);
         } finally {
             setDeleting(false);
         }
