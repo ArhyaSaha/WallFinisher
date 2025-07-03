@@ -2,6 +2,8 @@
 
 This is the backend API for an autonomous wall-finishing robot control system. The system is built with FastAPI and SQLite, featuring robust server-intensive computations and database-driven trajectory management.
 
+Deployed Link: [https://10x.arhya.codes](https://10x.arhya.codes)
+
 ## Project Overview
 
 The backend handles:
