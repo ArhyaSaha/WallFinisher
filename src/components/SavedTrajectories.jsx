@@ -1,12 +1,13 @@
 // src/components/SavedTrajectories.jsx
 import React, { useState, useEffect } from 'react';
-import { Archive, Calendar, Square, Activity, Clock, Layers } from 'lucide-react';
+import { Archive, Calendar, Square, Activity, Clock, Layers, Trash2 } from 'lucide-react';
 import { API_BASE_URL } from '../utils/api';
 
 const SavedTrajectories = () => {
     const [trajectories, setTrajectories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [deleting, setDeleting] = useState(false);
 
     useEffect(() => {
         fetchTrajectories();
@@ -27,6 +28,25 @@ const SavedTrajectories = () => {
             setError(err.message);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const deleteTrajectory = async (id) => {
+        try {
+            setDeleting(true);
+            const response = await fetch(`${API_BASE_URL}/trajectory/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete trajectory');
+            }
+
+            setTrajectories((prev) => prev.filter((trajectory) => trajectory.id !== id));
+        } catch (err) {
+            alert(err.message);
+        } finally {
+            setDeleting(false);
         }
     };
 
@@ -119,6 +139,14 @@ const SavedTrajectories = () => {
                                         </div>
                                     </div>
                                 </div>
+                                {/* Delete Button */}
+                                <button
+                                    onClick={() => deleteTrajectory(trajectory.id)}
+                                    disabled={deleting}
+                                    className="flex items-center justify-center w-8 h-8 disabled:bg-gray-600 text-white rounded-lg transition-colors"
+                                >
+                                    <Trash2 className="w-4 h-4 text-red-600 hover:text-red-900" />
+                                </button>
                             </div>
 
                             {/* Trajectory Details */}
@@ -165,55 +193,8 @@ const SavedTrajectories = () => {
                                     </div>
                                 )}
                             </div>
-
-                            {/* Status Indicator */}
-                            <div className="mt-3 pt-3 border-t border-gray-700">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
-                                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                                        <span className="text-xs text-gray-400">Saved Successfully</span>
-                                    </div>
-                                    <span className="text-xs text-gray-500">
-                                        ID: {trajectory.id}
-                                    </span>
-                                </div>
-                            </div>
                         </div>
                     ))}
-                </div>
-            )}
-
-            {/* Summary Stats */}
-            {trajectories.length > 0 && (
-                <div className="mt-6 pt-6 border-t border-gray-700">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                        <div className="bg-gray-900/30 rounded-lg p-3">
-                            <div className="text-xl font-bold text-white">
-                                {trajectories.length}
-                            </div>
-                            <div className="text-xs text-gray-400">Total Trajectories</div>
-                        </div>
-                        <div className="bg-gray-900/30 rounded-lg p-3">
-                            <div className="text-xl font-bold text-blue-400">
-                                {trajectories.reduce((sum, t) => sum + (t.total_points || 0), 0)}
-                            </div>
-                            <div className="text-xs text-gray-400">Total Points</div>
-                        </div>
-                        <div className="bg-gray-900/30 rounded-lg p-3">
-                            <div className="text-xl font-bold text-green-400">
-                                {trajectories.reduce((sum, t) => sum + (t.wall_width * t.wall_height), 0).toFixed(1)}
-                            </div>
-                            <div className="text-xs text-gray-400">Total Area (m²)</div>
-                        </div>
-                        <div className="bg-gray-900/30 rounded-lg p-3">
-                            <div className="text-xl font-bold text-yellow-400">
-                                {trajectories.filter(t => t.execution_time).length > 0 ?
-                                    (trajectories.reduce((sum, t) => sum + (t.execution_time || 0), 0) /
-                                        trajectories.filter(t => t.execution_time).length).toFixed(2) : 'N/A'}
-                            </div>
-                            <div className="text-xs text-gray-400">Avg. Gen. Time (s)</div>
-                        </div>
-                    </div>
                 </div>
             )}
         </div>

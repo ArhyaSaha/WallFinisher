@@ -290,6 +290,31 @@ async def execute_trajectory(trajectory_id: int):
         logger.error(f"Execution failed: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Execution failed: {str(e)}")
 
+@app.delete("/trajectory/{trajectory_id}")
+async def delete_trajectory(trajectory_id: int):
+    """
+    Delete a specific trajectory by ID
+    """
+    try:
+        with db_manager.get_connection() as conn:
+            # Check if the trajectory exists
+            cursor = conn.execute("SELECT id FROM trajectories WHERE id = ?", (trajectory_id,))
+            result = cursor.fetchone()
+            if not result:
+                raise HTTPException(status_code=404, detail="Trajectory not found")
+            
+            # Delete the trajectory
+            conn.execute("DELETE FROM trajectories WHERE id = ?", (trajectory_id,))
+            conn.commit()
+        
+        logger.info(f"Trajectory {trajectory_id} deleted successfully")
+        return {"message": f"Trajectory {trajectory_id} deleted successfully"}
+    
+    except Exception as e:
+        logger.error(f"Failed to delete trajectory {trajectory_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete trajectory: {str(e)}")
+    
+
 @app.get("/robot_actions/{session_id}")
 async def get_robot_actions(session_id: str):
     """
